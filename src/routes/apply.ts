@@ -9,8 +9,8 @@ import {
   MAX_FILES_PER_FIELD,
   type DocumentFieldName,
 } from "../validation";
-import { saveSubmission, saveSubmissionFile, markBitrixSent, markBitrixFailed, hashIp } from "../db";
-import { pushLeadToBitrix, BitrixNotConfiguredError, type BitrixFileAttachment } from "../services/bitrix";
+import { saveSubmission, saveSubmissionFile, markSynced, markSyncFailed, hashIp } from "../db";
+import { submitToAdminPanel, AdminPanelNotConfiguredError, type AdminPanelFileAttachment } from "../services/adminPanel";
 import { logger } from "../logger";
 import { maskForLog } from "../services/crypto";
 
@@ -107,22 +107,23 @@ applyRouter.post("/submit", handleUpload, async (req, res) => {
   }
 
   try {
-    const bitrixFiles: BitrixFileAttachment[] = validFiles.map(({ fieldName, file }) => ({
+    const attachments: AdminPanelFileAttachment[] = validFiles.map(({ fieldName, file }) => ({
       fieldName,
       originalFilename: file.originalname,
+      mimeType: file.mimetype,
       buffer: file.buffer,
     }));
-    const leadId = await pushLeadToBitrix(data, bitrixFiles);
-    markBitrixSent(submissionId, leadId);
+    const externalId = await submitToAdminPanel(data, attachments);
+    markSynced(submissionId, externalId);
     logger.info(
-      { submissionId, leadId, pinflMasked: maskForLog(data.domesticPinfl) },
-      "Ariza Bitrix24'ga muvaffaqiyatli yuborildi"
+      { submissionId, externalId, pinflMasked: maskForLog(data.domesticPinfl) },
+      "Ariza admin panelga muvaffaqiyatli yuborildi"
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Noma'lum xatolik";
-    markBitrixFailed(submissionId, message);
-    if (!(err instanceof BitrixNotConfiguredError)) {
-      logger.error({ submissionId, err: message }, "Bitrix24'ga yuborishda xatolik, keyinroq qayta urinib ko'riladi");
+    markSyncFailed(submissionId, message);
+    if (!(err instanceof AdminPanelNotConfiguredError)) {
+      logger.error({ submissionId, err: message }, "Admin panelga yuborishda xatolik, keyinroq qayta urinib ko'riladi");
     }
   }
 

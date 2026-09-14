@@ -1,5 +1,5 @@
-import { getPendingOrFailedSubmissions, getSubmissionFiles, readAndDecryptFile, markBitrixSent, markBitrixFailed } from "../db";
-import { pushLeadToBitrix, BitrixNotConfiguredError, type BitrixFileAttachment } from "./bitrix";
+import { getPendingOrFailedSubmissions, getSubmissionFiles, readAndDecryptFile, markSynced, markSyncFailed } from "../db";
+import { submitToAdminPanel, AdminPanelNotConfiguredError, type AdminPanelFileAttachment } from "./adminPanel";
 import { logger } from "../logger";
 import { config } from "../config";
 
@@ -7,25 +7,26 @@ const MAX_ATTEMPTS = 8;
 const INTERVAL_MS = 60_000;
 
 async function runOnce(): Promise<void> {
-  if (!config.bitrix.webhookUrl) return;
+  if (!config.adminPanel.apiUrl || !config.adminPanel.apiKey) return;
 
   const pending = getPendingOrFailedSubmissions(MAX_ATTEMPTS);
   for (const submission of pending) {
     try {
       const fileMetas = getSubmissionFiles(submission.id);
-      const bitrixFiles: BitrixFileAttachment[] = fileMetas.map((meta) => ({
+      const files: AdminPanelFileAttachment[] = fileMetas.map((meta) => ({
         fieldName: meta.fieldName,
         originalFilename: meta.originalFilename,
+        mimeType: meta.mimeType,
         buffer: readAndDecryptFile(meta.storagePath),
       }));
 
-      const leadId = await pushLeadToBitrix(submission.data, bitrixFiles);
-      markBitrixSent(submission.id, leadId);
-      logger.info({ submissionId: submission.id, leadId }, "Kechiktirilgan ariza Bitrix24'ga yuborildi");
+      const externalId = await submitToAdminPanel(submission.data, files);
+      markSynced(submission.id, externalId);
+      logger.info({ submissionId: submission.id, externalId }, "Kechiktirilgan ariza admin panelga yuborildi");
     } catch (err) {
-      if (err instanceof BitrixNotConfiguredError) return;
+      if (err instanceof AdminPanelNotConfiguredError) return;
       const message = err instanceof Error ? err.message : "Noma'lum xatolik";
-      markBitrixFailed(submission.id, message);
+      markSyncFailed(submission.id, message);
       logger.warn({ submissionId: submission.id, err: message }, "Qayta urinish muvaffaqiyatsiz tugadi");
     }
   }
@@ -33,7 +34,7 @@ async function runOnce(): Promise<void> {
 
 let timer: NodeJS.Timeout | undefined;
 
-export function startBitrixRetryWorker(): void {
+export function startRetryWorker(): void {
   if (timer) return;
   timer = setInterval(() => {
     runOnce().catch((err) => logger.error({ err }, "Retry worker kutilmagan xatolik"));
@@ -41,7 +42,7 @@ export function startBitrixRetryWorker(): void {
   timer.unref();
 }
 
-export function stopBitrixRetryWorker(): void {
+export function stopRetryWorker(): void {
   if (timer) clearInterval(timer);
   timer = undefined;
 }

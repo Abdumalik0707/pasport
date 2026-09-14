@@ -4,13 +4,13 @@ import helmet from "helmet";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
-import { config, assertBitrixConfigured } from "./config";
+import { config, assertAdminPanelConfigured } from "./config";
 import { logger } from "./logger";
 import { issueCsrfToken, verifyCsrfToken } from "./middleware/csrf";
 import { applyRouter } from "./routes/apply";
-import { startBitrixRetryWorker } from "./services/retryWorker";
+import { startRetryWorker } from "./services/retryWorker";
 
-assertBitrixConfigured();
+assertAdminPanelConfigured();
 
 const app = express();
 
@@ -78,5 +78,5 @@ app.use((err: unknown, _req: express.Request, res: express.Response, _next: expr
 
 app.listen(config.port, () => {
   logger.info(`Server ${config.publicOrigin} manzilida ${config.port}-portda ishga tushdi`);
-  startBitrixRetryWorker();
+  startRetryWorker();
 });

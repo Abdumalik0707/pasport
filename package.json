@@ -2,10 +2,10 @@
   "name": "pasport-lead-form",
   "version": "1.0.0",
   "private": true,
-  "description": "Pasport ma'lumotlarini qabul qiluvchi va Bitrix24 CRM'ga uzatuvchi xavfsiz landing sahifa",
+  "description": "Pasport ma'lumotlarini qabul qiluvchi va admin panelga uzatuvchi xavfsiz landing sahifa",
   "type": "commonjs",
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=22.5.0"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",

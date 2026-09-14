@@ -26,13 +26,13 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     encrypted_payload TEXT NOT NULL,
     ip_hash TEXT NOT NULL,
-    bitrix_status TEXT NOT NULL DEFAULT 'pending',
-    bitrix_lead_id TEXT,
-    bitrix_attempts INTEGER NOT NULL DEFAULT 0,
+    sync_status TEXT NOT NULL DEFAULT 'pending',
+    external_id TEXT,
+    sync_attempts INTEGER NOT NULL DEFAULT 0,
     last_error TEXT
   );
 `);
-db.exec(`CREATE INDEX IF NOT EXISTS idx_submissions_bitrix_status ON submissions(bitrix_status);`);
+db.exec(`CREATE INDEX IF NOT EXISTS idx_submissions_sync_status ON submissions(sync_status);`);
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS submission_files (
@@ -51,8 +51,8 @@ export interface StoredSubmission {
   id: string;
   createdAt: string;
   data: ApplicationInput;
-  bitrixStatus: "pending" | "sent" | "failed";
-  bitrixAttempts: number;
+  syncStatus: "pending" | "sent" | "failed";
+  syncAttempts: number;
 }
 
 export function saveSubmission(id: string, data: ApplicationInput, ipHash: string): void {
@@ -64,16 +64,16 @@ export function saveSubmission(id: string, data: ApplicationInput, ipHash: strin
   );
 }
 
-export function markBitrixSent(id: string, leadId: string): void {
+export function markSynced(id: string, externalId: string): void {
   db.prepare(
-    `UPDATE submissions SET bitrix_status = 'sent', bitrix_lead_id = ?, last_error = NULL WHERE id = ?`
-  ).run(leadId, id);
+    `UPDATE submissions SET sync_status = 'sent', external_id = ?, last_error = NULL WHERE id = ?`
+  ).run(externalId, id);
 }
 
-export function markBitrixFailed(id: string, errorMessage: string): void {
+export function markSyncFailed(id: string, errorMessage: string): void {
   db.prepare(
     `UPDATE submissions
-     SET bitrix_status = 'failed', bitrix_attempts = bitrix_attempts + 1, last_error = ?
+     SET sync_status = 'failed', sync_attempts = sync_attempts + 1, last_error = ?
      WHERE id = ?`
   ).run(errorMessage.slice(0, 500), id);
 }
@@ -82,16 +82,16 @@ interface SubmissionRow {
   id: string;
   created_at: string;
   encrypted_payload: string;
-  bitrix_status: "pending" | "sent" | "failed";
-  bitrix_attempts: number;
+  sync_status: "pending" | "sent" | "failed";
+  sync_attempts: number;
 }
 
 export function getPendingOrFailedSubmissions(maxAttempts: number): StoredSubmission[] {
   const rows = db
     .prepare(
-      `SELECT id, created_at, encrypted_payload, bitrix_status, bitrix_attempts
+      `SELECT id, created_at, encrypted_payload, sync_status, sync_attempts
        FROM submissions
-       WHERE bitrix_status IN ('pending', 'failed') AND bitrix_attempts < ?
+       WHERE sync_status IN ('pending', 'failed') AND sync_attempts < ?
        ORDER BY created_at ASC
        LIMIT 20`
     )
@@ -101,8 +101,8 @@ export function getPendingOrFailedSubmissions(maxAttempts: number): StoredSubmis
     id: row.id,
     createdAt: row.created_at,
     data: JSON.parse(decryptField(row.encrypted_payload)) as ApplicationInput,
-    bitrixStatus: row.bitrix_status,
-    bitrixAttempts: row.bitrix_attempts,
+    syncStatus: row.sync_status,
+    syncAttempts: row.sync_attempts,
   }));
 }
 
