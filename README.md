@@ -1,11 +1,12 @@
 # Pasport ma'lumotlarini qabul qiluvchi landing sahifa → Bitrix24 + Admin panel
 
 Foydalanuvchi pasport/shaxsiy ma'lumotlarini kiritadigan xavfsiz forma. Ma'lumotlar serverga
-yuborilgach, avtomatik ravishda **ikkala manzilga ham** — **Bitrix24 CRM**'ga (lead sifatida)
-va **sizning admin panelingizga** (API orqali) — mustaqil ravishda uzatiladi. Har biri o'zicha
-kuzatiladi: biri muvaffaqiyatsiz bo'lsa, ikkinchisiga ta'sir qilmaydi. Parallel ravishda
-mahalliy bazada **shifrlangan holda** zaxiralanadi — ikkalasi ham vaqtincha ishlamay qolsa
-ham ariza yo'qolmaydi, fon jarayoni har birini alohida keyinroq qayta yuboradi.
+yuborilgach, avtomatik ravishda **ikkala manzilga ham** — **Bitrix24 CRM**'ga ("Pasport
+ma'lumotlari" voronkasida "Yangi lid" bosqichida **sdelka** sifatida) va **sizning admin
+panelingizga** (API orqali) — mustaqil ravishda uzatiladi. Har biri o'zicha kuzatiladi: biri
+muvaffaqiyatsiz bo'lsa, ikkinchisiga ta'sir qilmaydi. Parallel ravishda mahalliy bazada
+**shifrlangan holda** zaxiralanadi — ikkalasi ham vaqtincha ishlamay qolsa ham ariza
+yo'qolmaydi, fon jarayoni har birini alohida keyinroq qayta yuboradi.
 
 ## Texnologiyalar va xavfsizlik
 
@@ -48,8 +49,14 @@ cp .env.example .env
    ```
 2. **`BITRIX_WEBHOOK_URL`** — Bitrix24 > *Sozlamalar → Ilovalar → Webhook'lar → Kiruvchi
    webhook* orqali yarating. Format: `https://<domen>.bitrix24.uz/rest/<user_id>/<kod>/`.
-   (Ixtiyoriy) Lead'ga pasport/ota-ona ma'lumotlari uchun maxsus maydonlar qo'shsangiz,
-   kodlarini `BITRIX_FIELD_*` qatorlariga yozing — bo'lmasa hammasi "Izoh" maydonida ko'rinadi.
+   Ariza **Sdelka (Deal)** sifatida `BITRIX_DEAL_CATEGORY_ID` voronkasida
+   `BITRIX_DEAL_NEW_STAGE_ID` bosqichida yaratiladi (`crm.category.list` va
+   `crm.dealcategory.stage.list` REST metodlari orqali bilib olinadi). Sdelka'da pasport/
+   ota-ona ma'lumotlari uchun maxsus maydonlar (matn va fayl turida) yaratib, kodlarini
+   `BITRIX_DEAL_FIELD_*` qatorlariga yozing — bo'lmasa hammasi "Izoh" maydonida ko'rinadi.
+   **Diqqat:** Bitrix24'dagi "Fayl" turidagi maxsus maydonlarga qiymat faqat
+   `{ fileData: [nom, base64] }` ko'rinishida yuborilganda saqlanadi (oddiy `[nom, base64]`
+   massivi jim tarzda e'tiborga olinmaydi) — kodda shu format ishlatilgan.
 3. **`ADMIN_API_URL`** va **`ADMIN_API_KEY`** — admin panelingiz arizalarni qabul qiladigan
    API manzili va maxfiy kaliti (masalan `https://sizning-admin-panel/api/submissions`).
 4. (Ixtiyoriy) `ADMIN_API_FILE_FIELD_*` — admin panelingiz multipart so'rovda fayllarni qanday

@@ -8,7 +8,7 @@ import {
   markAdminFailed,
 } from "../db";
 import { submitToAdminPanel, AdminPanelNotConfiguredError, type AdminPanelFileAttachment } from "./adminPanel";
-import { pushLeadToBitrix, BitrixNotConfiguredError, type BitrixFileAttachment } from "./bitrix";
+import { pushDealToBitrix, BitrixNotConfiguredError, type BitrixFileAttachment } from "./bitrix";
 import { logger } from "../logger";
 import { config } from "../config";
 
@@ -51,9 +51,9 @@ async function runOnce(): Promise<void> {
           originalFilename: meta.originalFilename,
           buffer: readAndDecryptFile(meta.storagePath),
         }));
-        const leadId = await pushLeadToBitrix(submission.data, files);
-        markBitrixSent(submission.id, leadId);
-        logger.info({ submissionId: submission.id, leadId }, "Kechiktirilgan ariza Bitrix24'ga yuborildi");
+        const dealId = await pushDealToBitrix(submission.data, files);
+        markBitrixSent(submission.id, dealId);
+        logger.info({ submissionId: submission.id, dealId }, "Kechiktirilgan ariza Bitrix24'ga (sdelka) yuborildi");
       } catch (err) {
         if (!(err instanceof BitrixNotConfiguredError)) {
           const message = err instanceof Error ? err.message : "Noma'lum xatolik";

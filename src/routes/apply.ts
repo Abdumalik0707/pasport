@@ -19,7 +19,7 @@ import {
   hashIp,
 } from "../db";
 import { submitToAdminPanel, AdminPanelNotConfiguredError, type AdminPanelFileAttachment } from "../services/adminPanel";
-import { pushLeadToBitrix, BitrixNotConfiguredError, type BitrixFileAttachment } from "../services/bitrix";
+import { pushDealToBitrix, BitrixNotConfiguredError, type BitrixFileAttachment } from "../services/bitrix";
 import { logger } from "../logger";
 import { maskForLog } from "../services/crypto";
 
@@ -133,7 +133,7 @@ applyRouter.post("/submit", handleUpload, async (req, res) => {
   // ikkinchisiga ta'sir qilmaydi, har biri o'zicha qayta uriniladi.
   const [adminResult, bitrixResult] = await Promise.allSettled([
     submitToAdminPanel(data, adminAttachments),
-    pushLeadToBitrix(data, bitrixAttachments),
+    pushDealToBitrix(data, bitrixAttachments),
   ]);
 
   if (adminResult.status === "fulfilled") {
@@ -149,7 +149,7 @@ applyRouter.post("/submit", handleUpload, async (req, res) => {
 
   if (bitrixResult.status === "fulfilled") {
     markBitrixSent(submissionId, bitrixResult.value);
-    logger.info({ submissionId, leadId: bitrixResult.value, pinflMasked }, "Ariza Bitrix24'ga yuborildi");
+    logger.info({ submissionId, dealId: bitrixResult.value, pinflMasked }, "Ariza Bitrix24'ga (sdelka) yuborildi");
   } else {
     const message = bitrixResult.reason instanceof Error ? bitrixResult.reason.message : "Noma'lum xatolik";
     markBitrixFailed(submissionId, message);

@@ -46,25 +46,30 @@ export const config = {
     webhookUrl: process.env.BITRIX_WEBHOOK_URL ?? "",
     leadSourceId: process.env.BITRIX_LEAD_SOURCE_ID ?? "WEB",
     assignedById: process.env.BITRIX_ASSIGNED_BY_ID ?? "",
-    fields: {
-      birthDate: process.env.BITRIX_FIELD_BIRTH_DATE ?? "",
-      citizenship: process.env.BITRIX_FIELD_CITIZENSHIP ?? "",
-      officialAddress: process.env.BITRIX_FIELD_ADDRESS ?? "",
-      telegramUsername: process.env.BITRIX_FIELD_TELEGRAM ?? "",
-      domesticPassportNumber: process.env.BITRIX_FIELD_DOMESTIC_PASSPORT_NUMBER ?? "",
-      domesticPinfl: process.env.BITRIX_FIELD_DOMESTIC_PINFL ?? "",
-      internationalPassportNumber: process.env.BITRIX_FIELD_INTL_PASSPORT_NUMBER ?? "",
-      internationalPinfl: process.env.BITRIX_FIELD_INTL_PINFL ?? "",
-      fatherFullName: process.env.BITRIX_FIELD_FATHER_NAME ?? "",
-      fatherPhone: process.env.BITRIX_FIELD_FATHER_PHONE ?? "",
-      motherFullName: process.env.BITRIX_FIELD_MOTHER_NAME ?? "",
-      motherPhone: process.env.BITRIX_FIELD_MOTHER_PHONE ?? "",
+    // "Pasport ma'lumotlari" voronkasi (CATEGORY_ID) va "Yangi lid" bosqichi (STAGE_ID)
+    dealCategoryId: Number(process.env.BITRIX_DEAL_CATEGORY_ID ?? 1),
+    dealNewStageId: process.env.BITRIX_DEAL_NEW_STAGE_ID ?? "C1:NEW",
+    // Sdelka (Deal) entitisida forma savollariga mos qilib yaratilgan maxsus maydon kodlari.
+    dealFields: {
+      birthDate: process.env.BITRIX_DEAL_FIELD_BIRTH_DATE ?? "",
+      citizenship: process.env.BITRIX_DEAL_FIELD_CITIZENSHIP ?? "",
+      officialAddress: process.env.BITRIX_DEAL_FIELD_ADDRESS ?? "",
+      telegramUsername: process.env.BITRIX_DEAL_FIELD_TELEGRAM ?? "",
+      domesticPassportNumber: process.env.BITRIX_DEAL_FIELD_DOMESTIC_PASSPORT_NUMBER ?? "",
+      domesticPinfl: process.env.BITRIX_DEAL_FIELD_DOMESTIC_PINFL ?? "",
+      internationalPassportNumber: process.env.BITRIX_DEAL_FIELD_INTL_PASSPORT_NUMBER ?? "",
+      internationalPinfl: process.env.BITRIX_DEAL_FIELD_INTL_PINFL ?? "",
+      fatherFullName: process.env.BITRIX_DEAL_FIELD_FATHER_NAME ?? "",
+      fatherPhone: process.env.BITRIX_DEAL_FIELD_FATHER_PHONE ?? "",
+      motherFullName: process.env.BITRIX_DEAL_FIELD_MOTHER_NAME ?? "",
+      motherPhone: process.env.BITRIX_DEAL_FIELD_MOTHER_PHONE ?? "",
     },
-    fileFields: {
-      photo3x4: process.env.BITRIX_FIELD_FILE_PHOTO ?? "",
-      passportScan: process.env.BITRIX_FIELD_FILE_PASSPORT_SCAN ?? "",
-      diploma: process.env.BITRIX_FIELD_FILE_DIPLOMA ?? "",
-      transcript: process.env.BITRIX_FIELD_FILE_TRANSCRIPT ?? "",
+    // Sdelka'da ochilgan "Fayl" turidagi maxsus maydon kodlari
+    dealFileFields: {
+      photo3x4: process.env.BITRIX_DEAL_FIELD_FILE_PHOTO ?? "",
+      passportScan: process.env.BITRIX_DEAL_FIELD_FILE_PASSPORT_SCAN ?? "",
+      diploma: process.env.BITRIX_DEAL_FIELD_FILE_DIPLOMA ?? "",
+      transcript: process.env.BITRIX_DEAL_FIELD_FILE_TRANSCRIPT ?? "",
     },
   },
 };
