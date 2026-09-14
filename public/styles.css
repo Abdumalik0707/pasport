@@ -1,0 +1,219 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  line-height: 1.6;
+  padding: 20px;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin: 0 0 10px;
+  font-size: 1.6rem;
+}
+
+.description {
+  text-align: center;
+  color: #e74c3c;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+fieldset {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 25px;
+  background-color: #fafafa;
+}
+
+legend {
+  font-weight: bold;
+  color: #2980b9;
+  background: #fff;
+  padding: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group--spaced {
+  margin-top: 15px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="tel"],
+input[type="email"],
+input[type="file"],
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 1rem;
+  background: #fff;
+  color: #333;
+}
+
+input:focus {
+  border-color: #2980b9;
+  outline: none;
+  box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
+}
+
+input.invalid {
+  border-color: #e74c3c;
+}
+
+small {
+  display: block;
+  color: #7f8c8d;
+  font-size: 0.85em;
+  margin-top: 4px;
+}
+
+.error {
+  display: block;
+  color: #e74c3c;
+  font-size: 0.85em;
+  min-height: 1.2em;
+  margin-top: 4px;
+}
+
+.phone-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.phone-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.phone-row .phone-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.phone-row .btn-remove-phone {
+  margin-left: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #e74c3c;
+  border-radius: 4px;
+  width: 38px;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.phone-row .btn-remove-phone:hover {
+  background: #fdecea;
+}
+
+.btn-add-phone {
+  align-self: flex-start;
+  margin-top: 8px;
+  border: 1px dashed #2980b9;
+  background: #fff;
+  color: #2980b9;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.85em;
+  cursor: pointer;
+}
+
+.btn-add-phone:hover {
+  background: #eaf3fa;
+}
+
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #219653;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-status {
+  min-height: 1.2em;
+  text-align: center;
+  font-size: 0.9em;
+  color: #e74c3c;
+  margin: 14px 0 0;
+}
+
+.success-panel {
+  text-align: center;
+  padding: 20px 10px 10px;
+}
+
+.success-panel h2 {
+  color: #27ae60;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

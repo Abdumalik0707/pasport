@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>1-Kurs Talabalarini Ro'yxatga Olish Formasi</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="form-container">
+    <h1>Yangi Talaba Ma'lumotnomasi</h1>
+    <p class="description">
+      Barcha ma'lumotlarni to'g'ri to'ldiring! Har bir ma'lumot sizning ertangi hujjat
+      olishingizda va boshqa masalalarda muhim o'rin tutadi!
+    </p>
+
+    <form id="application-form" novalidate>
+      <!-- Bot-himoya: haqiqiy foydalanuvchiga ko'rinmaydigan maydon -->
+      <div class="honeypot" aria-hidden="true">
+        <label for="website">Kompaniya veb-sayti</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <fieldset>
+        <legend>Shaxsiy Ma'lumotlar</legend>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">Ismingiz *</label>
+            <input type="text" id="firstName" name="firstName" required autocomplete="given-name" />
+            <span class="error" data-error-for="firstName"></span>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Familiyangiz *</label>
+            <input type="text" id="lastName" name="lastName" required autocomplete="family-name" />
+            <span class="error" data-error-for="lastName"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="patronymic">Otangizning ismi *</label>
+            <input type="text" id="patronymic" name="patronymic" required />
+            <span class="error" data-error-for="patronymic"></span>
+          </div>
+          <div class="form-group">
+            <label for="birthDate">Tug'ilgan sanangiz *</label>
+            <input type="date" id="birthDate" name="birthDate" required />
+            <span class="error" data-error-for="birthDate"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="citizenship">Fuqaroligingiz *</label>
+            <select id="citizenship" name="citizenship" required>
+              <option value="" disabled>Tanlang</option>
+            </select>
+            <span class="error" data-error-for="citizenship"></span>
+          </div>
+          <div class="form-group">
+            <label for="officialAddress">Rasmiy manzilingiz qayerda? *</label>
+            <input type="text" id="officialAddress" name="officialAddress" required />
+            <span class="error" data-error-for="officialAddress"></span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Aloqa Ma'lumotlari</legend>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone-1">O'zingizning telefon raqamingiz *</label>
+            <input type="hidden" id="phone" name="phone" />
+            <div class="phone-group" data-phone-group="phone">
+              <div class="phone-row">
+                <input type="tel" class="phone-input" id="phone-1" inputmode="tel" maxlength="16" placeholder="+998901234567" autocomplete="tel" required />
+              </div>
+            </div>
+            <button type="button" class="btn-add-phone" data-add-phone="phone">+ Yana raqam qo'shish</button>
+            <span class="error" data-error-for="phone"></span>
+          </div>
+          <div class="form-group">
+            <label for="telegramUsername">Telegram Nickname *</label>
+            <input type="text" id="telegramUsername" name="telegramUsername" required placeholder="@username" autocomplete="off" />
+            <small>Iltimos aniq yozing, keyin doimiy uni o'zgartirmang.</small>
+            <span class="error" data-error-for="telegramUsername"></span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Pasport Ma'lumotlari</legend>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="domesticPassportNumber">Oddiy pasport raqamingiz *</label>
+            <input type="text" id="domesticPassportNumber" name="domesticPassportNumber" required placeholder="Masalan: AA1234567" maxlength="9" autocomplete="off" />
+            <span class="error" data-error-for="domesticPassportNumber"></span>
+          </div>
+          <div class="form-group">
+            <label for="domesticPinfl">Oddiy pasport JShShIR (ПИНФЛ) *</label>
+            <input type="text" id="domesticPinfl" name="domesticPinfl" required placeholder="14 talik unikal raqam" inputmode="numeric" maxlength="14" autocomplete="off" />
+            <span class="error" data-error-for="domesticPinfl"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="internationalPassportNumber">Xorijga chiqish pasporti (Zagran) raqami</label>
+            <input type="text" id="internationalPassportNumber" name="internationalPassportNumber" placeholder="Masalan: AA1234567" maxlength="9" autocomplete="off" />
+            <span class="error" data-error-for="internationalPassportNumber"></span>
+          </div>
+          <div class="form-group">
+            <label for="internationalPinfl">Xorijga chiqish (Zagran) JShShIR (ПИНФЛ)</label>
+            <input type="text" id="internationalPinfl" name="internationalPinfl" placeholder="14 talik unikal raqam" inputmode="numeric" maxlength="14" autocomplete="off" />
+            <span class="error" data-error-for="internationalPinfl"></span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Ota-Ona Ma'lumotlari (Iqoma uchun muhim)</legend>
+
+        <div class="form-group">
+          <label for="fatherFullName">Otangizning to'liq ism, familiya va otalarining ismi *</label>
+          <input type="text" id="fatherFullName" name="fatherFullName" required />
+          <span class="error" data-error-for="fatherFullName"></span>
+        </div>
+        <div class="form-group">
+          <label for="fatherPhone-1">Otangizning telefon raqami *</label>
+          <input type="hidden" id="fatherPhone" name="fatherPhone" />
+          <div class="phone-group" data-phone-group="fatherPhone">
+            <div class="phone-row">
+              <input type="tel" class="phone-input" id="fatherPhone-1" inputmode="tel" maxlength="16" placeholder="+998901234567" required />
+            </div>
+          </div>
+          <button type="button" class="btn-add-phone" data-add-phone="fatherPhone">+ Yana raqam qo'shish</button>
+          <span class="error" data-error-for="fatherPhone"></span>
+        </div>
+
+        <div class="form-group form-group--spaced">
+          <label for="motherFullName">Onangizning to'liq ism, familiya va otalarining ismi *</label>
+          <input type="text" id="motherFullName" name="motherFullName" required />
+          <span class="error" data-error-for="motherFullName"></span>
+        </div>
+        <div class="form-group">
+          <label for="motherPhone-1">Onangizning telefon raqami *</label>
+          <input type="hidden" id="motherPhone" name="motherPhone" />
+          <div class="phone-group" data-phone-group="motherPhone">
+            <div class="phone-row">
+              <input type="tel" class="phone-input" id="motherPhone-1" inputmode="tel" maxlength="16" placeholder="+998901234567" required />
+            </div>
+          </div>
+          <button type="button" class="btn-add-phone" data-add-phone="motherPhone">+ Yana raqam qo'shish</button>
+          <span class="error" data-error-for="motherPhone"></span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Elektron Hujjatlar (PDF)</legend>
+
+        <div class="form-group">
+          <label for="photo3x4">Rasmingiz 3*4 (Tiniq bo'lsin) *</label>
+          <input type="file" id="photo3x4" name="photo3x4" accept=".pdf,image/jpeg,image/png" multiple required />
+          <small>Agarda tayyor rasm bo'lmasa, tiniq qilib telefonda rasm olib PDF qilib joylang.</small>
+          <span class="error" data-error-for="photo3x4"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="passportScan">Pasport rasmingiz (oldi-orqa) *</label>
+          <input type="file" id="passportScan" name="passportScan" accept=".pdf" multiple required />
+          <small>Fayl PDF formatida bo'lishi kerak.</small>
+          <span class="error" data-error-for="passportScan"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="diploma">Maktab yoki litseydan olgan diplomingiz *</label>
+          <input type="file" id="diploma" name="diploma" accept=".pdf" multiple required />
+          <small>To'liq har bir ma'lumot yozilgan sahifalari bitta PDF qilib joylansin.</small>
+          <span class="error" data-error-for="diploma"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="transcript">Transkript (Baholar qo'yilgan hujjat) *</label>
+          <input type="file" id="transcript" name="transcript" accept=".pdf" multiple required />
+          <small>Maktabda o'qigan bo'lsangiz baholaringiz qo'yilgan hujjatni PDF qilib joylang.</small>
+          <span class="error" data-error-for="transcript"></span>
+        </div>
+      </fieldset>
+
+      <button type="submit" id="btn-submit" class="submit-btn">Ma'lumotlarni Yuborish</button>
+
+      <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+    </form>
+
+    <div class="success-panel" id="success-panel" hidden>
+      <h2>Arizangiz qabul qilindi!</h2>
+      <p>Tez orada mutaxassislarimiz siz bilan bog'lanishadi. Murojaat raqamingiz: <strong id="submission-id"></strong></p>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
