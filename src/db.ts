@@ -20,19 +20,27 @@ export const db = new DatabaseSync(config.db.path);
 db.exec("PRAGMA journal_mode = WAL;");
 db.exec("PRAGMA foreign_keys = ON;");
 
+// Har bir ariza ikkita mustaqil manzilga (Bitrix24 va admin panel) yuboriladi.
+// Ularning holati alohida-alohida kuzatiladi — biri muvaffaqiyatli, ikkinchisi
+// muvaffaqiyatsiz bo'lishi mumkin, shu sababli har biri o'zicha qayta uriniladi.
 db.exec(`
   CREATE TABLE IF NOT EXISTS submissions (
     id TEXT PRIMARY KEY,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     encrypted_payload TEXT NOT NULL,
     ip_hash TEXT NOT NULL,
-    sync_status TEXT NOT NULL DEFAULT 'pending',
-    external_id TEXT,
-    sync_attempts INTEGER NOT NULL DEFAULT 0,
-    last_error TEXT
+    bitrix_status TEXT NOT NULL DEFAULT 'pending',
+    bitrix_lead_id TEXT,
+    bitrix_attempts INTEGER NOT NULL DEFAULT 0,
+    bitrix_last_error TEXT,
+    admin_status TEXT NOT NULL DEFAULT 'pending',
+    admin_external_id TEXT,
+    admin_attempts INTEGER NOT NULL DEFAULT 0,
+    admin_last_error TEXT
   );
 `);
-db.exec(`CREATE INDEX IF NOT EXISTS idx_submissions_sync_status ON submissions(sync_status);`);
+db.exec(`CREATE INDEX IF NOT EXISTS idx_submissions_bitrix_status ON submissions(bitrix_status);`);
+db.exec(`CREATE INDEX IF NOT EXISTS idx_submissions_admin_status ON submissions(admin_status);`);
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS submission_files (
@@ -47,12 +55,17 @@ db.exec(`
 `);
 db.exec(`CREATE INDEX IF NOT EXISTS idx_submission_files_submission_id ON submission_files(submission_id);`);
 
+export type SyncStatus = "pending" | "sent" | "failed";
+export type SyncTarget = "bitrix" | "admin";
+
 export interface StoredSubmission {
   id: string;
   createdAt: string;
   data: ApplicationInput;
-  syncStatus: "pending" | "sent" | "failed";
-  syncAttempts: number;
+  bitrixStatus: SyncStatus;
+  bitrixAttempts: number;
+  adminStatus: SyncStatus;
+  adminAttempts: number;
 }
 
 export function saveSubmission(id: string, data: ApplicationInput, ipHash: string): void {
@@ -64,16 +77,30 @@ export function saveSubmission(id: string, data: ApplicationInput, ipHash: strin
   );
 }
 
-export function markSynced(id: string, externalId: string): void {
+export function markBitrixSent(id: string, leadId: string): void {
   db.prepare(
-    `UPDATE submissions SET sync_status = 'sent', external_id = ?, last_error = NULL WHERE id = ?`
+    `UPDATE submissions SET bitrix_status = 'sent', bitrix_lead_id = ?, bitrix_last_error = NULL WHERE id = ?`
+  ).run(leadId, id);
+}
+
+export function markBitrixFailed(id: string, errorMessage: string): void {
+  db.prepare(
+    `UPDATE submissions
+     SET bitrix_status = 'failed', bitrix_attempts = bitrix_attempts + 1, bitrix_last_error = ?
+     WHERE id = ?`
+  ).run(errorMessage.slice(0, 500), id);
+}
+
+export function markAdminSent(id: string, externalId: string): void {
+  db.prepare(
+    `UPDATE submissions SET admin_status = 'sent', admin_external_id = ?, admin_last_error = NULL WHERE id = ?`
   ).run(externalId, id);
 }
 
-export function markSyncFailed(id: string, errorMessage: string): void {
+export function markAdminFailed(id: string, errorMessage: string): void {
   db.prepare(
     `UPDATE submissions
-     SET sync_status = 'failed', sync_attempts = sync_attempts + 1, last_error = ?
+     SET admin_status = 'failed', admin_attempts = admin_attempts + 1, admin_last_error = ?
      WHERE id = ?`
   ).run(errorMessage.slice(0, 500), id);
 }
@@ -82,27 +109,33 @@ interface SubmissionRow {
   id: string;
   created_at: string;
   encrypted_payload: string;
-  sync_status: "pending" | "sent" | "failed";
-  sync_attempts: number;
+  bitrix_status: SyncStatus;
+  bitrix_attempts: number;
+  admin_status: SyncStatus;
+  admin_attempts: number;
 }
 
+/** Bitrix24 va/yoki admin panelga hali yuborilmagan (yoki muvaffaqiyatsiz) arizalarni qaytaradi. */
 export function getPendingOrFailedSubmissions(maxAttempts: number): StoredSubmission[] {
   const rows = db
     .prepare(
-      `SELECT id, created_at, encrypted_payload, sync_status, sync_attempts
+      `SELECT id, created_at, encrypted_payload, bitrix_status, bitrix_attempts, admin_status, admin_attempts
        FROM submissions
-       WHERE sync_status IN ('pending', 'failed') AND sync_attempts < ?
+       WHERE (bitrix_status IN ('pending', 'failed') AND bitrix_attempts < ?)
+          OR (admin_status IN ('pending', 'failed') AND admin_attempts < ?)
        ORDER BY created_at ASC
        LIMIT 20`
     )
-    .all(maxAttempts) as unknown as SubmissionRow[];
+    .all(maxAttempts, maxAttempts) as unknown as SubmissionRow[];
 
   return rows.map((row) => ({
     id: row.id,
     createdAt: row.created_at,
     data: JSON.parse(decryptField(row.encrypted_payload)) as ApplicationInput,
-    syncStatus: row.sync_status,
-    syncAttempts: row.sync_attempts,
+    bitrixStatus: row.bitrix_status,
+    bitrixAttempts: row.bitrix_attempts,
+    adminStatus: row.admin_status,
+    adminAttempts: row.admin_attempts,
   }));
 }
 

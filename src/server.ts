@@ -4,13 +4,13 @@ import helmet from "helmet";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
-import { config, assertAdminPanelConfigured } from "./config";
+import { config, assertIntegrationsConfigured } from "./config";
 import { logger } from "./logger";
 import { issueCsrfToken, verifyCsrfToken } from "./middleware/csrf";
 import { applyRouter } from "./routes/apply";
 import { startRetryWorker } from "./services/retryWorker";
 
-assertAdminPanelConfigured();
+assertIntegrationsConfigured();
 
 const app = express();
 

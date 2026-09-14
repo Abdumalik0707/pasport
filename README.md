@@ -1,9 +1,11 @@
-# Pasport ma'lumotlarini qabul qiluvchi landing sahifa → Admin panel
+# Pasport ma'lumotlarini qabul qiluvchi landing sahifa → Bitrix24 + Admin panel
 
 Foydalanuvchi pasport/shaxsiy ma'lumotlarini kiritadigan xavfsiz forma. Ma'lumotlar serverga
-yuborilgach, avtomatik ravishda **sizning admin panelingizga** (API orqali) uzatiladi va
-parallel ravishda mahalliy bazada **shifrlangan holda** zaxiralanadi (admin panel vaqtincha
-ishlamay qolsa ham ariza yo'qolmaydi — fon jarayoni uni keyinroq avtomatik qayta yuboradi).
+yuborilgach, avtomatik ravishda **ikkala manzilga ham** — **Bitrix24 CRM**'ga (lead sifatida)
+va **sizning admin panelingizga** (API orqali) — mustaqil ravishda uzatiladi. Har biri o'zicha
+kuzatiladi: biri muvaffaqiyatsiz bo'lsa, ikkinchisiga ta'sir qilmaydi. Parallel ravishda
+mahalliy bazada **shifrlangan holda** zaxiralanadi — ikkalasi ham vaqtincha ishlamay qolsa
+ham ariza yo'qolmaydi, fon jarayoni har birini alohida keyinroq qayta yuboradi.
 
 ## Texnologiyalar va xavfsizlik
 
@@ -44,11 +46,19 @@ cp .env.example .env
    ```bash
    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    ```
-2. **`ADMIN_API_URL`** va **`ADMIN_API_KEY`** — admin panelingiz arizalarni qabul qiladigan
+2. **`BITRIX_WEBHOOK_URL`** — Bitrix24 > *Sozlamalar → Ilovalar → Webhook'lar → Kiruvchi
+   webhook* orqali yarating. Format: `https://<domen>.bitrix24.uz/rest/<user_id>/<kod>/`.
+   (Ixtiyoriy) Lead'ga pasport/ota-ona ma'lumotlari uchun maxsus maydonlar qo'shsangiz,
+   kodlarini `BITRIX_FIELD_*` qatorlariga yozing — bo'lmasa hammasi "Izoh" maydonida ko'rinadi.
+3. **`ADMIN_API_URL`** va **`ADMIN_API_KEY`** — admin panelingiz arizalarni qabul qiladigan
    API manzili va maxfiy kaliti (masalan `https://sizning-admin-panel/api/submissions`).
-3. (Ixtiyoriy) `ADMIN_API_FILE_FIELD_*` — admin panelingiz multipart so'rovda fayllarni qanday
+4. (Ixtiyoriy) `ADMIN_API_FILE_FIELD_*` — admin panelingiz multipart so'rovda fayllarni qanday
    maydon nomlari bilan kutishiga qarab moslang. Standart qiymatlar: `photo`, `passport_scan`,
    `diploma`, `transcript`.
+
+Ikkalasi ham mustaqil ishlaydi — faqat `BITRIX_WEBHOOK_URL` to'ldirilsa, faqat Bitrix24'ga;
+faqat `ADMIN_API_URL`/`ADMIN_API_KEY` to'ldirilsa, faqat admin panelga; ikkalasi to'ldirilsa,
+har bir arizaga ikkalasiga ham yuboriladi.
 
 Admin panel API'siga yuboriladigan asosiy maydonlar: `full_name`, `birth_date`,
 `passport_series`, `passport_number`, `pinfl`, `phone`, `address`, `comment`. Bulardan tashqari
@@ -86,8 +96,9 @@ src/
   middleware/csrf.ts    — CSRF himoyasi
   routes/apply.ts       — ariza va fayllarni qabul qilish endpoint'i (multer)
   services/adminPanel.ts — admin panel API bilan ishlash (matn + fayl maydonlari)
+  services/bitrix.ts     — Bitrix24 REST API bilan ishlash (matn + fayl maydonlari)
   services/crypto.ts     — AES-256-GCM shifrlash (matn va fayllar uchun)
-  services/retryWorker.ts — admin panel vaqtincha ishlamasa, fon jarayonda qayta urinish
+  services/retryWorker.ts — ikkala manzil vaqtincha ishlamasa, fon jarayonda mustaqil qayta urinish
 public/
   index.html, styles.css, app.js — bitta uzun forma (frontend)
 ```

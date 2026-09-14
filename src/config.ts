@@ -42,13 +42,44 @@ export const config = {
       transcript: process.env.ADMIN_API_FILE_FIELD_TRANSCRIPT ?? "transcript",
     },
   },
+  bitrix: {
+    webhookUrl: process.env.BITRIX_WEBHOOK_URL ?? "",
+    leadSourceId: process.env.BITRIX_LEAD_SOURCE_ID ?? "WEB",
+    assignedById: process.env.BITRIX_ASSIGNED_BY_ID ?? "",
+    fields: {
+      birthDate: process.env.BITRIX_FIELD_BIRTH_DATE ?? "",
+      citizenship: process.env.BITRIX_FIELD_CITIZENSHIP ?? "",
+      officialAddress: process.env.BITRIX_FIELD_ADDRESS ?? "",
+      telegramUsername: process.env.BITRIX_FIELD_TELEGRAM ?? "",
+      domesticPassportNumber: process.env.BITRIX_FIELD_DOMESTIC_PASSPORT_NUMBER ?? "",
+      domesticPinfl: process.env.BITRIX_FIELD_DOMESTIC_PINFL ?? "",
+      internationalPassportNumber: process.env.BITRIX_FIELD_INTL_PASSPORT_NUMBER ?? "",
+      internationalPinfl: process.env.BITRIX_FIELD_INTL_PINFL ?? "",
+      fatherFullName: process.env.BITRIX_FIELD_FATHER_NAME ?? "",
+      fatherPhone: process.env.BITRIX_FIELD_FATHER_PHONE ?? "",
+      motherFullName: process.env.BITRIX_FIELD_MOTHER_NAME ?? "",
+      motherPhone: process.env.BITRIX_FIELD_MOTHER_PHONE ?? "",
+    },
+    fileFields: {
+      photo3x4: process.env.BITRIX_FIELD_FILE_PHOTO ?? "",
+      passportScan: process.env.BITRIX_FIELD_FILE_PASSPORT_SCAN ?? "",
+      diploma: process.env.BITRIX_FIELD_FILE_DIPLOMA ?? "",
+      transcript: process.env.BITRIX_FIELD_FILE_TRANSCRIPT ?? "",
+    },
+  },
 };
 
-export function assertAdminPanelConfigured(): void {
+export function assertIntegrationsConfigured(): void {
   if (!config.adminPanel.apiUrl || !config.adminPanel.apiKey) {
     // eslint-disable-next-line no-console
     console.warn(
-      "[OGOHLANTIRISH] ADMIN_API_URL yoki ADMIN_API_KEY sozlanmagan. Arizalar faqat mahalliy bazaga saqlanadi va admin panelga yuborilmaydi."
+      "[OGOHLANTIRISH] ADMIN_API_URL yoki ADMIN_API_KEY sozlanmagan. Arizalar admin panelga yuborilmaydi (mahalliy bazada saqlanib qoladi)."
+    );
+  }
+  if (!config.bitrix.webhookUrl) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[OGOHLANTIRISH] BITRIX_WEBHOOK_URL sozlanmagan. Arizalar Bitrix24'ga yuborilmaydi (mahalliy bazada saqlanib qoladi)."
     );
   }
 }
