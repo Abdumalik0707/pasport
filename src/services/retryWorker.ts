@@ -9,6 +9,7 @@ import {
 } from "../db";
 import { submitToAdminPanel, AdminPanelNotConfiguredError, type AdminPanelFileAttachment } from "./adminPanel";
 import { pushDealToBitrix, BitrixNotConfiguredError, type BitrixFileAttachment } from "./bitrix";
+import { isInFlight } from "./inFlight";
 import { logger } from "../logger";
 import { config } from "../config";
 
@@ -22,6 +23,10 @@ async function runOnce(): Promise<void> {
 
   const pending = getPendingOrFailedSubmissions(MAX_ATTEMPTS);
   for (const submission of pending) {
+    // So'rov handler hozir aynan shu arizani sinxron yubormoqda bo'lishi mumkin —
+    // dublikat yaratmaslik uchun uni chetlab o'tamiz, keyingi siklda qayta ko'riladi.
+    if (isInFlight(submission.id)) continue;
+
     const fileMetas = getSubmissionFiles(submission.id);
 
     if (adminConfigured && submission.adminStatus !== "sent" && submission.adminAttempts < MAX_ATTEMPTS) {

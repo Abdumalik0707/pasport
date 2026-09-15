@@ -115,14 +115,23 @@ interface SubmissionRow {
   admin_attempts: number;
 }
 
-/** Bitrix24 va/yoki admin panelga hali yuborilmagan (yoki muvaffaqiyatsiz) arizalarni qaytaradi. */
+/**
+ * Bitrix24 va/yoki admin panelga hali yuborilmagan (yoki muvaffaqiyatsiz) arizalarni qaytaradi.
+ *
+ * Diqqat: yangi saqlangan arizaning holati boshida 'pending' bo'ladi va so'rovni qabul
+ * qilgan handler shu zahoti (sinxron ravishda) uni yuborishga urinadi. Agar fon jarayoni
+ * (retry worker) bu oraliqda ishga tushib qolsa, xuddi shu arizani yana bir marta yuborib
+ * yuborishi (dublikat yaratishi) mumkin edi — buning oldini olish uchun faqat yetarlicha
+ * "eskirgan" (sinxron urinish uchun ajratilgan vaqtdan ko'proq) yozuvlar tanlanadi.
+ */
 export function getPendingOrFailedSubmissions(maxAttempts: number): StoredSubmission[] {
   const rows = db
     .prepare(
       `SELECT id, created_at, encrypted_payload, bitrix_status, bitrix_attempts, admin_status, admin_attempts
        FROM submissions
-       WHERE (bitrix_status IN ('pending', 'failed') AND bitrix_attempts < ?)
-          OR (admin_status IN ('pending', 'failed') AND admin_attempts < ?)
+       WHERE created_at <= datetime('now', '-90 seconds')
+         AND ((bitrix_status IN ('pending', 'failed') AND bitrix_attempts < ?)
+          OR (admin_status IN ('pending', 'failed') AND admin_attempts < ?))
        ORDER BY created_at ASC
        LIMIT 20`
     )

@@ -20,6 +20,7 @@ import {
 } from "../db";
 import { submitToAdminPanel, AdminPanelNotConfiguredError, type AdminPanelFileAttachment } from "../services/adminPanel";
 import { pushDealToBitrix, BitrixNotConfiguredError, type BitrixFileAttachment } from "../services/bitrix";
+import { markInFlight, clearInFlight } from "../services/inFlight";
 import { logger } from "../logger";
 import { maskForLog } from "../services/crypto";
 
@@ -130,11 +131,20 @@ applyRouter.post("/submit", handleUpload, async (req, res) => {
   }));
 
   // Ikkala manzilga mustaqil ravishda yuboriladi — biri muvaffaqiyatsiz bo'lsa ham,
-  // ikkinchisiga ta'sir qilmaydi, har biri o'zicha qayta uriniladi.
-  const [adminResult, bitrixResult] = await Promise.allSettled([
-    submitToAdminPanel(data, adminAttachments),
-    pushDealToBitrix(data, bitrixAttachments),
-  ]);
+  // ikkinchisiga ta'sir qilmaydi, har biri o'zicha qayta uriniladi. "inFlight" belgisi
+  // fon jarayoni (retryWorker) shu arizani parallel ravishda yana yubormasligini
+  // (dublikat yaratmasligini) ta'minlaydi.
+  markInFlight(submissionId);
+  let adminResult: PromiseSettledResult<string>;
+  let bitrixResult: PromiseSettledResult<string>;
+  try {
+    [adminResult, bitrixResult] = await Promise.allSettled([
+      submitToAdminPanel(data, adminAttachments),
+      pushDealToBitrix(data, bitrixAttachments),
+    ]);
+  } finally {
+    clearInFlight(submissionId);
+  }
 
   if (adminResult.status === "fulfilled") {
     markAdminSent(submissionId, adminResult.value);
